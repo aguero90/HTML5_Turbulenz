@@ -1,0 +1,13 @@
+{
+    "urnmapping": {
+        "textures/platformGreen.png": "platformGreen-caio.png",
+        "JSON/textures/platformGreen.json": "platformGreen-tizio.json",
+        "JSON/tilemap/platformGreenMap.json": "platformGreenMap-sempronio.json",
+        "textures/superMarioTiles.png": "superMarioTiles.png",
+        "JSON/textures/superMarioTiles.json": "superMarioTiles.json",
+        "JSON/tilemap/superMario.json": "superMario.json",
+        "textures/player.png": "player.png",
+        "JSON/textures/player.json": "player.json",
+        "textures/physics2d.png": "physics2d_ZY6NwL-LmgmzaZSr-SQgmQ.png"
+    }
+}

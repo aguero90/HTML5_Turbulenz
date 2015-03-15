@@ -1,0 +1,667 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>
+        Payments - Samples - Turbulenz Engine
+    </title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+    <style type="text/css">
+html, body, div, span, object, iframe, h1, h2, p, a, img, ul, li, fieldset, form, label, legend, table, thead, tbody, tfoot, tr, th, td {
+    border: 0;
+    font-size: 100%;
+    margin: 0;
+    outline: 0;
+    padding: 0;
+    vertical-align: baseline;
+}
+    </style>
+    <!-- block tz_app_header -->
+    
+    <link rel="stylesheet" type="text/css" href="css/base_template.css">
+    <link rel="shortcut icon" href="img/favicon.ico">
+
+<link rel="Stylesheet" type="text/css" href="css/jquery-ui-1.8.2.custom.css"/>
+<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script>
+
+    <!-- end tz_app_header -->
+</head>
+<body style="background:#B4B4B4;font:normal normal normal 13px/1.231 Helvetica,Arial,sans-serif;text-shadow:1px 1px #F9F8F8;">
+    <div id="titlebar" style="position:fixed;height:65px;top:0;right:0;left:0;">
+        <strong style="font-size:24px;line-height:64px;margin:16px;">
+            <!-- block tz_app_title_name -->
+            Payments
+            <!-- end tz_app_title_name -->
+        </strong>
+        <div id="titlelogo"
+             style="float:right;width:27px;height:27px;margin:18px 24px;">
+        </div>
+    </div>
+    <div id="sidebar"
+         style="background:#B4B4B4;position:fixed;width:303px;top:65px;left:0;">
+        <!-- block tz_app_html_controls -->
+        
+<div class="html-control text">
+    The +/- buttons change the items in the basket.
+</div>
+
+<div class="html-control control-button-pair">
+    <span class="control-title">Rocket launcher $3.99</span>
+    <span class="control-button-small">
+        <input type="button" id="button-decrease-rocket-launcher" value="-">
+        <input type="button" id="button-increase-rocket-launcher" value="+">
+    </span>
+</div>
+
+<div class="html-control text">
+    The rocket launcher is an own item.
+    Own items can only be purchased once and cannot be consumed.
+</div>
+
+<div class="html-control control-button-pair">
+    <span class="control-title">Grenade $0.99</span>
+    <span class="control-button-small">
+        <input type="button" id="button-decrease-grenade" value="-">
+        <input type="button" id="button-increase-grenade" value="+">
+    </span>
+</div>
+
+<div class="html-control text">
+    The grenade is a consume item.
+    It can be consumed by the game by clicking the "Use grenade" button.
+</div>
+
+<div class="html-control control-button-pair">
+    <span class="control-title">Grenade pack $1.99</span>
+    <span class="control-button-small">
+        <input type="button" id="button-decrease-grenade-pack" value="-">
+        <input type="button" id="button-increase-grenade-pack" value="+">
+    </span>
+</div>
+
+<div class="html-control text">
+    This offering is a pack containing 3 grenades.
+</div>
+
+<div class="html-control control-button-pair">
+    <span class="control-title">Explosives pack $4.99</span>
+    <span class="control-button-small">
+        <input type="button" id="button-decrease-explosives-pack" value="-">
+        <input type="button" id="button-increase-explosives-pack" value="+">
+    </span>
+</div>
+
+<div class="html-control text">
+    This offering is a pack containing 15 grenades and a rocket launcher.
+    The user can still only have one rocket launcher so it will not be added twice.
+</div>
+
+<div class="html-control control-button">
+    <input type="button" id="button-purchase" value="Purchase">
+</div>
+
+<div class="html-control control-button">
+    <input type="button" id="button-consume-grenade" value="Use grenade">
+</div>
+
+<div class="html-control control-button">
+    <input type="button" id="button-reset" value="Reset items">
+</div>
+
+        <!-- end tz_app_html_controls -->
+    </div>
+    <div id="engine" style="background:#939393;position:fixed;top:65px;
+                            bottom:0;right:0;left:303px;
+                            border-left:1px solid #898989;">
+        <!--
+          HTML to create a plugin or canvas instance.
+          Supplied by 'tz_engine_div' variable.
+        -->
+        
+        <canvas id="turbulenz_game_engine_canvas" moz-opaque="true" tabindex="1">
+            Sorry, but your browser does not support WebGL or does not have it
+            enabled.  To get a WebGL-enabled browser, please see:<br/>
+            <a href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" target="_blank">
+                Getting a WebGL Implementation
+            </a>
+        </canvas>
+
+        <script type="text/javascript">
+            var canvasSupported = true;
+            (function()
+            {
+                var contextNames = ["webgl", "experimental-webgl"];
+                var context = null;
+                var canvas = document.createElement('canvas');
+
+                document.body.appendChild(canvas);
+
+                for (var i = 0; i < contextNames.length; i += 1)
+                {
+                    try {
+                        context = canvas.getContext(contextNames[i]);
+                    } catch (e) {}
+
+                    if (context) {
+                        break;
+                    }
+                }
+                if (!context)
+                {
+                    canvasSupported = false;
+                    window.alert("Sorry, but your browser does not support WebGL or does not have it enabled.");
+                }
+
+                document.body.removeChild(canvas);
+            }());
+            var TurbulenzEngine = {};
+        </script>
+    </div>
+
+    <!-- begin 'tz_include_js' variable -->
+    <script type="text/javascript" src="jslib/debug.js"></script>
+<script type="text/javascript" src="jslib/vmath.js"></script>
+<script type="text/javascript" src="jslib/utilities.js"></script>
+<script type="text/javascript" src="jslib/aabbtree.js"></script>
+<script type="text/javascript" src="jslib/observer.js"></script>
+<script type="text/javascript" src="jslib/webgl/ddsloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/graphicsdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/inputdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/mathdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/networkdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/physicsdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/sounddevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/soundtarloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/tarloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/tgaloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/touch.js"></script>
+<script type="text/javascript" src="jslib/webgl/touchevent.js"></script>
+<script type="text/javascript" src="jslib/webgl/turbulenzengine.js"></script>
+<script type="text/javascript" src="jslib/requesthandler.js"></script>
+<script type="text/javascript" src="jslib/services/turbulenzservices.js"></script>
+<script type="text/javascript" src="jslib/services/turbulenzbridge.js"></script>
+<script type="text/javascript" src="jslib/services/storemanager.js"></script>
+<script type="text/javascript" src="jslib/services/sessiontoken.js"></script>
+<script type="text/javascript" src="jslib/services/gamesession.js"></script>
+<script type="text/javascript" src="jslib/services/mappingtable.js"></script>
+<script type="text/javascript" src="jslib/shadermanager.js"></script>
+<script type="text/javascript" src="jslib/draw2d.js"></script>
+<script type="text/javascript" src="jslib/fontmanager.js"></script>
+<script type="text/javascript" src="scripts/htmlcontrols.js"></script>
+<script type="text/javascript" src="scripts/simplebuttons.js"></script>
+    <!-- end 'tz_include_js' variable -->
+
+    <script type="text/javascript">
+      // ----------------------------------------
+      // Embedded code and startup code.
+      // Supplied by 'tz_startup_code' variable.
+      // ----------------------------------------
+      
+var x = 1;
+
+
+/*
+* @title: Payments
+* @description:
+* An example of how to manage the store basket and purchase or consume in-game items.
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*global TurbulenzEngine: true */
+/*global TurbulenzServices: false */
+/*global RequestHandler: false */
+/*global Draw2D: false */
+/*global FontManager: false */
+/*global ShaderManager: false */
+/*global Utilities: true */
+/*global HTMLControls: false */
+/*global ButtonManager: true */
+/*global debug: false */
+TurbulenzEngine.onload = function onloadFn() {
+    //==========================================================================
+    // Turbulenz Initialization
+    //==========================================================================
+    var graphicsDevice = TurbulenzEngine.createGraphicsDevice({});
+    var mathDevice = TurbulenzEngine.createMathDevice({});
+    var inputDevice = TurbulenzEngine.createInputDevice({});
+
+    var requestHandler = RequestHandler.create({});
+
+    var fontManager = FontManager.create(graphicsDevice, requestHandler);
+    var shaderManager = ShaderManager.create(graphicsDevice, requestHandler);
+
+    var font, shader;
+    var storeManager;
+    var gameSession;
+
+    function mappingTableReceived(mappingTable) {
+        var urlMapping = mappingTable.urlMapping;
+        var assetPrefix = mappingTable.assetPrefix;
+
+        fontManager.setPathRemapping(urlMapping, assetPrefix);
+        fontManager.load('fonts/hero.fnt', function (fontObject) {
+            font = fontObject;
+        });
+
+        shaderManager.setPathRemapping(urlMapping, assetPrefix);
+        shaderManager.load('shaders/font.cgfx', function (shaderObject) {
+            shader = shaderObject;
+        });
+    }
+
+    function sessionCreated() {
+        debug.log("payments: session created");
+        TurbulenzServices.createMappingTable(requestHandler, gameSession, mappingTableReceived);
+
+        storeManager = TurbulenzServices.createStoreManager(requestHandler, gameSession);
+    }
+
+    gameSession = TurbulenzServices.createGameSession(requestHandler, sessionCreated);
+
+    var draw2D = Draw2D.create({
+        graphicsDevice: graphicsDevice
+    });
+
+    draw2D.configure({
+        viewportRectangle: [0, 0, 20, 10],
+        scaleMode: 'scale'
+    });
+
+    var status = [];
+    function setStatus(msg) {
+        status.push(msg);
+    }
+
+    function clearStatus() {
+        TurbulenzEngine.setTimeout(function () {
+            status.shift();
+        }, 500);
+    }
+
+    var clearColor = [0.3, 0.3, 0.3, 1.0];
+
+    var fontTechnique, fontTechniqueParameters;
+    var titleScale = 1.2;
+    var normalScale = 0.75;
+
+    var gameTriggeredPurchase = false;
+    var invalidateButtons = false;
+
+    var purchase = function purchaseFn() {
+        if (storeManager.showConfirmPurchase()) {
+            gameTriggeredPurchase = true;
+            setStatus('Waiting for purchase confirmation');
+            var purchaseButton = document.getElementById('button-purchase');
+            if (purchaseButton) {
+                purchaseButton.disabled = true;
+            }
+        } else {
+            debug.log("call to showConfirmPurchase failed");
+        }
+    };
+
+    var consume = function consume() {
+        setStatus('Consuming');
+        invalidateButtons = true;
+        storeManager.consume('grenade', 1, clearStatus);
+    };
+
+    var reset = function resetFn() {
+        setStatus('Resetting user items');
+
+        // for testing only (this is not available on the Gamesite)
+        Utilities.ajax({
+            url: '/api/v1/store/user/items/remove-all/' + gameSession.gameSlug,
+            method: 'POST',
+            async: true,
+            callback: function () {
+                storeManager.requestUserItems(clearStatus);
+            },
+            requestHandler: requestHandler
+        });
+
+        storeManager.emptyBasket();
+    };
+
+    var userProfile = TurbulenzServices.createUserProfile(requestHandler);
+    var upgrade = function upgradeFn() {
+        debug.log("Upgrade button pressed ...");
+
+        var onUpgrade = function onUpgradeFn() {
+            debug.log("User returned from upgrade screen, regetting profile");
+            userProfile = TurbulenzServices.createUserProfile(requestHandler);
+        };
+        TurbulenzServices.upgradeAnonymousUser(onUpgrade);
+    };
+
+    var setButtons = false;
+    var oldWidth = 0;
+    var oldHeight = 0;
+    SimpleButtonManager.init(inputDevice);
+
+    function mainLoop() {
+        if (!graphicsDevice.beginFrame()) {
+            return;
+        }
+
+        setButtons = invalidateButtons || (oldWidth !== graphicsDevice.width || oldHeight !== graphicsDevice.height);
+        invalidateButtons = false;
+        oldWidth = graphicsDevice.width;
+        oldHeight = graphicsDevice.height;
+
+        graphicsDevice.clear(clearColor);
+
+        // Draw fonts.
+        graphicsDevice.setTechnique(fontTechnique);
+        fontTechniqueParameters.clipSpace = mathDevice.v4Build(2 / graphicsDevice.width, -2 / graphicsDevice.height, -1, 1, fontTechniqueParameters.clipSpace);
+        graphicsDevice.setTechniqueParameters(fontTechniqueParameters);
+
+        var xPaddingLeft = 1;
+        var xOffset = xPaddingLeft;
+        var yPaddingTop = 0;
+        var yOffset = yPaddingTop;
+
+        function newColumn() {
+            xOffset += 10;
+            yOffset = yPaddingTop;
+        }
+
+        function writeFont(text, scale, clickCallback, buttonName) {
+            if (text) {
+                var topLeft = draw2D.viewportUnmap(xOffset, yOffset);
+                if (setButtons && clickCallback) {
+                    var textBlockSize = font.calculateTextDimensions(text, scale * 1.2, 0);
+                    debug.log("NEW BUTTON: " + buttonName);
+                    SimpleButtonManager.addButton({
+                        id: buttonName,
+                        left: topLeft[0],
+                        top: topLeft[1],
+                        right: topLeft[0] + textBlockSize.width,
+                        bottom: topLeft[1] + textBlockSize.height,
+                        callback: function () {
+                            debug.log("BUTTON: " + buttonName);
+                            clickCallback();
+                        }
+                    });
+                }
+
+                var textScale = scale;
+                if (buttonName) {
+                    var button = SimpleButtonManager.buttons[buttonName];
+                    if (button && button.hovering) {
+                        textScale *= 1.2;
+                    }
+                }
+
+                font.drawTextRect(text, {
+                    rect: [topLeft[0], topLeft[1], 0, 0],
+                    scale: textScale,
+                    spacing: 0,
+                    alignment: 0
+                });
+            }
+
+            yOffset += scale;
+        }
+
+        if (setButtons) {
+            SimpleButtonManager.clearButtons();
+        }
+
+        if (status.length > 0) {
+            writeFont('Status: ' + status[0], normalScale);
+        } else {
+            writeFont('Status:', normalScale);
+        }
+
+        yPaddingTop = 1;
+        yOffset = yPaddingTop;
+
+        var makeRemoveFromBasket = function makeAddToBasketFn(key) {
+            return function () {
+                if (storeManager.removeFromBasket(key, 1)) {
+                    setStatus('Updating basket');
+                    storeManager.updateBasket(function basketUpdatedFn() {
+                        clearStatus();
+                    });
+                }
+            };
+        };
+
+        var makeAddToBasket = function makeAddToBasketFn(key) {
+            return function () {
+                if (storeManager.addToBasket(key, 1)) {
+                    setStatus('Updating basket');
+                    storeManager.updateBasket(function basketUpdatedFn() {
+                        clearStatus();
+                        invalidateButtons = true;
+                    });
+                }
+            };
+        };
+
+        var makeConsume = function makeAddToBasketFn(key) {
+            return function () {
+                setStatus('Consuming');
+                storeManager.consume(key, 1, function consumedFn() {
+                    clearStatus();
+                    invalidateButtons = true;
+                });
+            };
+        };
+
+        var offering;
+        var offerings = storeManager.getOfferings();
+        var key;
+
+        writeFont("Offerings", titleScale);
+        for (key in offerings) {
+            if (offerings.hasOwnProperty(key) && offerings[key].available) {
+                offering = offerings[key];
+                writeFont(offering.title, normalScale, makeAddToBasket(key), 'add ' + key);
+            }
+        }
+
+        newColumn();
+        var basketItems = storeManager.basket.items;
+        writeFont("Basket amount", titleScale);
+        for (key in offerings) {
+            if (offerings.hasOwnProperty(key) && offerings[key].available) {
+                if (basketItems.hasOwnProperty(key)) {
+                    writeFont(basketItems[key].amount.toString(10), normalScale, makeRemoveFromBasket(key), 'remove ' + key);
+                } else {
+                    writeFont('0', normalScale);
+                }
+            }
+        }
+
+        writeFont('Purchase', normalScale, purchase, 'purchase');
+        writeFont('Reset', normalScale, reset, 'reset');
+
+        if (userProfile && userProfile.anonymous) {
+            writeFont('Upgrade User', normalScale, upgrade, 'upgrade');
+        }
+
+        yPaddingTop = 7;
+        yOffset = yPaddingTop;
+        xOffset = xPaddingLeft;
+
+        var userItems = storeManager.getUserItems();
+        var resources = storeManager.getResources();
+
+        writeFont("User items", titleScale);
+        for (key in userItems) {
+            if (userItems.hasOwnProperty(key)) {
+                writeFont(resources[key].title, normalScale, makeConsume(key), 'consume ' + key);
+            }
+        }
+
+        newColumn();
+        writeFont("Amount", titleScale);
+        for (key in userItems) {
+            if (userItems.hasOwnProperty(key)) {
+                writeFont(userItems[key].amount.toString(10), normalScale, makeConsume(key), 'consume ' + key);
+            }
+        }
+
+        graphicsDevice.endFrame();
+    }
+
+    var intervalID = 0;
+    function loadingLoop() {
+        if (font && shader && storeManager && storeManager.ready) {
+            fontTechnique = shader.getTechnique('font');
+            fontTechniqueParameters = graphicsDevice.createTechniqueParameters({
+                clipSpace: mathDevice.v4BuildZero(),
+                alphaRef: 0.01,
+                color: mathDevice.v4BuildOne()
+            });
+
+            var onSitePurchaseDialogCompleted = function onSitePurchaseDialogCompletedFn() {
+                if (gameTriggeredPurchase) {
+                    clearStatus();
+
+                    var purchaseButton = document.getElementById('button-purchase');
+                    if (purchaseButton) {
+                        purchaseButton.disabled = false;
+                    }
+                    gameTriggeredPurchase = false;
+                    invalidateButtons = true;
+                }
+            };
+
+            storeManager.onSitePurchaseConfirmed = onSitePurchaseDialogCompleted;
+            storeManager.onSitePurchaseRejected = onSitePurchaseDialogCompleted;
+
+            TurbulenzEngine.clearInterval(intervalID);
+            intervalID = TurbulenzEngine.setInterval(mainLoop, 1000 / 60);
+        }
+    }
+    intervalID = TurbulenzEngine.setInterval(loadingLoop, 100);
+
+    // Controls
+    var htmlControls = HTMLControls.create();
+
+    function addStoreItemBasketControls(itemKey) {
+        htmlControls.addButtonControl({
+            id: "button-decrease-" + itemKey,
+            value: "-",
+            fn: function () {
+                if (storeManager.removeFromBasket(itemKey, 1)) {
+                    setStatus('Updating basket');
+                    storeManager.updateBasket(clearStatus);
+                }
+            }
+        });
+
+        htmlControls.addButtonControl({
+            id: "button-increase-" + itemKey,
+            value: "+",
+            fn: function () {
+                if (storeManager.addToBasket(itemKey, 1)) {
+                    setStatus('Updating basket');
+                    storeManager.updateBasket(clearStatus);
+                }
+            }
+        });
+    }
+
+    htmlControls.addButtonControl({
+        id: "button-consume-grenade",
+        value: "Use grenade",
+        fn: consume
+    });
+
+    addStoreItemBasketControls('rocket-launcher');
+    addStoreItemBasketControls('grenade');
+    addStoreItemBasketControls('grenade-pack');
+    addStoreItemBasketControls('explosives-pack');
+
+    htmlControls.addButtonControl({
+        id: "button-purchase",
+        value: "Purchase",
+        fn: purchase
+    });
+
+    htmlControls.addButtonControl({
+        id: "button-reset",
+        value: "Reset",
+        fn: reset
+    });
+
+    htmlControls.register();
+
+    // Create a scene destroy callback to run when the window is closed
+    TurbulenzEngine.onunload = function destroyScene() {
+        if (intervalID) {
+            TurbulenzEngine.clearInterval(intervalID);
+        }
+
+        if (gameSession) {
+            gameSession.destroy();
+            gameSession = null;
+        }
+    };
+};
+
+        // Engine startup
+        window.onload = function ()
+        {
+            var appEntry = TurbulenzEngine.onload;
+            var appShutdown = TurbulenzEngine.onunload;
+            if (!appEntry) {
+                window.alert("TurbulenzEngine.onload has not been set");
+                return;
+            }
+
+            var canvas =
+                document.getElementById('turbulenz_game_engine_canvas');
+
+            var startCanvas = function startCanvasFn()
+            {
+                if (canvas.getContext && canvasSupported)
+                {
+                    TurbulenzEngine = WebGLTurbulenzEngine.create({
+                        canvas: canvas,
+                        fillParent: true
+                    });
+
+                    if (!TurbulenzEngine) {
+                        window.alert("Failed to init TurbulenzEngine (canvas)");
+                        return;
+                    }
+
+                    TurbulenzEngine.onload = appEntry;
+                    TurbulenzEngine.onunload = appShutdown;
+                    appEntry()
+                }
+            }
+
+            var previousOnBeforeUnload = window.onbeforeunload;
+            window.onbeforeunload = function ()
+            {
+                if (TurbulenzEngine.onunload) {
+                    TurbulenzEngine.onunload.call(this);
+                }
+            };  // window.beforeunload
+
+            startCanvas();
+        };  // window.onload()
+
+    </script>
+
+</body>
+</html>

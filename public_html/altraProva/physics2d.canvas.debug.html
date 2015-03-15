@@ -1,0 +1,751 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>
+            Physics2D - Samples - Turbulenz Engine
+        </title>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+        <style type="text/css">
+            html, body, div, span, object, iframe, h1, h2, p, a, img, ul, li, fieldset, form, label, legend, table, thead, tbody, tfoot, tr, th, td {
+                border: 0;
+                font-size: 100%;
+                margin: 0;
+                outline: 0;
+                padding: 0;
+                vertical-align: baseline;
+            }
+        </style>
+        <!-- block tz_app_header -->
+
+        <link rel="stylesheet" type="text/css" href="css/base_template.css">
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <link rel="Stylesheet" type="text/css" href="css/jquery-ui-1.8.2.custom.css"/>
+        <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script>
+
+        <!-- end tz_app_header -->
+    </head>
+    <body>
+        <div id="engine">
+            <canvas id="canvas" width="1000" height="600" style="display: block; width: 1000px; height: 600px; margin-left: 270px; margin-top: 94px; cursor: inherit;">
+                Sorry, but your browser does not support WebGL or does not have it
+                enabled.  To get a WebGL-enabled browser, please see:<br/>
+                <a href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" target="_blank">
+                    Getting a WebGL Implementation
+                </a>
+            </canvas>
+
+            <script type="text/javascript">
+                var canvasSupported = true;
+                (function ()
+                {
+                    var contextNames = ["webgl", "experimental-webgl"];
+                    var context = null;
+                    var canvas = document.createElement('canvas');
+
+                    document.body.appendChild(canvas);
+
+                    for (var i = 0; i < contextNames.length; i += 1)
+                    {
+                        try {
+                            context = canvas.getContext(contextNames[i]);
+                        } catch (e) {
+                        }
+
+                        if (context) {
+                            break;
+                        }
+                    }
+                    if (!context)
+                    {
+                        canvasSupported = false;
+                        window.alert("Sorry, but your browser does not support WebGL or does not have it enabled.");
+                    }
+
+                    document.body.removeChild(canvas);
+                }());
+                var TurbulenzEngine = {};
+            </script>
+        </div>
+
+        <!-- begin 'tz_include_js' variable -->
+        <script type="text/javascript" src="jslib/debug.js"></script>
+        <script type="text/javascript" src="jslib/vmath.js"></script>
+        <!-- <script type="text/javascript" src="jslib/utilities.js"></script> -->
+        <!-- <script type="text/javascript" src="jslib/aabbtree.js"></script> -->
+        <script type="text/javascript" src="jslib/observer.js"></script>
+        <script type="text/javascript" src="jslib/webgl/ddsloader.js"></script>
+        <script type="text/javascript" src="jslib/webgl/graphicsdevice.js"></script>
+        <script type="text/javascript" src="jslib/webgl/inputdevice.js"></script>
+        <script type="text/javascript" src="jslib/webgl/mathdevice.js"></script>
+        <!-- <script type="text/javascript" src="jslib/webgl/networkdevice.js"></script> -->
+        <script type="text/javascript" src="jslib/webgl/physicsdevice.js"></script>
+        <script type="text/javascript" src="jslib/webgl/sounddevice.js"></script>
+        <!-- <script type="text/javascript" src="jslib/webgl/soundtarloader.js"></script> -->
+        <!-- <script type="text/javascript" src="jslib/webgl/tarloader.js"></script> -->
+        <!-- <script type="text/javascript" src="jslib/webgl/tgaloader.js"></script> -->
+        <!-- <script type="text/javascript" src="jslib/webgl/touch.js"></script> -->
+        <!-- <script type="text/javascript" src="jslib/webgl/touchevent.js"></script> -->
+        <script type="text/javascript" src="jslib/webgl/turbulenzengine.js"></script>
+        <script type="text/javascript" src="jslib/requesthandler.js"></script>
+        <script type="text/javascript" src="jslib/services/turbulenzservices.js"></script>
+        <!-- <script type="text/javascript" src="jslib/services/turbulenzbridge.js"></script> -->
+        <script type="text/javascript" src="jslib/services/gamesession.js"></script>
+        <script type="text/javascript" src="jslib/services/mappingtable.js"></script>
+        <script type="text/javascript" src="jslib/shadermanager.js"></script>
+        <script type="text/javascript" src="jslib/physics2ddevice.js"></script>
+        <script type="text/javascript" src="jslib/draw2d.js"></script>
+        <script type="text/javascript" src="jslib/boxtree.js"></script>
+        <!-- <script type="text/javascript" src="jslib/physics2ddebugdraw.js"></script> -->
+        <!-- <script type="text/javascript" src="jslib/textureeffects.js"></script> -->
+        <script type="text/javascript" src="jslib/fontmanager.js"></script>
+        <script type="text/javascript" src="jslib/soundmanager.js"></script>
+        <!-- <script type="text/javascript" src="scripts/htmlcontrols.js"></script> -->
+        <!-- end 'tz_include_js' variable -->
+
+        <script type="text/javascript" src="MYSCRIPTS/game.js"></script>
+        <script type="text/javascript" src="MYSCRIPTS/player.js"></script>
+        <script type="text/javascript" src="MYSCRIPTS/bonus.js"></script>
+        <script type="text/javascript" src="MYSCRIPTS/platform.js"></script>
+
+        <script type="text/javascript">
+
+                TurbulenzEngine.onload = function onloadFn() {
+
+                    var modularCode = true;
+
+                    if (modularCode) {
+
+                        var game = new Game();
+                        game.init();
+
+                    } else {
+                        //==========================================================================
+                        // HTML Controls
+                        //==========================================================================
+                        var htmlControls;
+
+                        var debugEnabled = false;
+                        var contactsEnabled = false;
+
+                        //==========================================================================
+                        // Turbulenz Initialization
+                        //==========================================================================
+                        var graphicsDevice = TurbulenzEngine.createGraphicsDevice({});
+                        var mathDevice = TurbulenzEngine.createMathDevice({});
+                        var soundDevice = TurbulenzEngine.createSoundDevice({}); //++
+                        var requestHandler = RequestHandler.create({});
+
+                        var draw2DTexture;
+                        var gameSession;
+
+                        var fontManager = FontManager.create(graphicsDevice, requestHandler); //
+                        var shaderManager = ShaderManager.create(graphicsDevice, requestHandler); //
+                        var soundManager = SoundManager.create(soundDevice, requestHandler); //++
+                        var font, shader; //
+
+                        var bgSound = null; //++
+                        var bgSource = soundDevice.createSource({//++
+                            position: [0, 0, 0],
+                            relative: false,
+                            looping: true,
+                            pitch: 1.0
+                        });
+
+                        function sessionCreated(gameSession) {
+                            TurbulenzServices.createMappingTable(requestHandler, gameSession, function (table) {
+                                var urlMapping = table.urlMapping; //
+                                var assetPrefix = table.assetPrefix; //
+
+                                shaderManager.setPathRemapping(urlMapping, assetPrefix); //
+                                fontManager.setPathRemapping(urlMapping, assetPrefix); //
+
+
+                                fontManager.load('fonts/hero.fnt', function (fontObject) { //
+                                    font = fontObject;
+                                });
+
+                                shaderManager.load('shaders/font.cgfx', function (shaderObject) { //
+                                    shader = shaderObject;
+                                });
+
+
+                                var soundURL;
+                                if (soundDevice.isSupported("FILEFORMAT_OGG")) {
+                                    soundURL = table.getURL("sounds/backgroundSound.ogg");
+                                } else {
+                                    soundURL = table.getURL("sounds/backgroundSound.mp3");
+                                }
+
+                                soundManager.load(soundURL, true, function (sound) {
+                                    bgSound = sound;
+                                });
+
+
+                                graphicsDevice.createTexture({
+                                    src: table.getURL("textures/physics2d.png"),
+                                    mipmaps: true,
+                                    onload: function (texture) {
+                                        if (texture) {
+                                            draw2DTexture = texture;
+                                        }
+                                    }
+                                });
+                            });
+                        }
+                        gameSession = TurbulenzServices.createGameSession(requestHandler, sessionCreated);
+
+                        //==========================================================================
+                        // Physics2D/Draw2D
+                        //==========================================================================
+                        // set up.
+                        var phys2D = Physics2DDevice.create();
+                        var collisionUtils = phys2D.createCollisionUtils();
+
+                        // size of physics stage.
+                        var stageWidth = 30;
+                        var stageHeight = 20;
+
+                        var draw2D = Draw2D.create({
+                            graphicsDevice: graphicsDevice
+                        });
+                        var debug = Physics2DDebugDraw.create({
+                            graphicsDevice: graphicsDevice
+                        });
+
+                        // Configure draw2D viewport to the physics stage.
+                        // As well as the physics2D debug-draw viewport.
+                        draw2D.configure({
+                            viewportRectangle: [0, 0, stageWidth, stageHeight],
+                            scaleMode: 'scale'
+                        });
+                        debug.setPhysics2DViewport([0, 0, stageWidth, stageHeight]);
+
+                        var world = phys2D.createWorld({
+                            gravity: [0, 20]
+                        });
+
+                        var rubberMaterial = phys2D.createMaterial({
+                            elasticity: 0.9,
+                            staticFriction: 6,
+                            dynamicFriction: 4,
+                            rollingFriction: 0.001
+                        });
+
+                        var heavyMaterial = phys2D.createMaterial({
+                            density: 3
+                        });
+
+                        var conveyorBeltMaterial = phys2D.createMaterial({
+                            elasticity: 0,
+                            staticFriction: 10,
+                            dynamicFriction: 8,
+                            rollingFriction: 0.1
+                        });
+
+                        var borderMaterial = phys2D.createMaterial({
+                            elasticity: 0,
+                            staticFriction: 0,
+                            dynamicFriction: 0 // in questo modo il corpo scivola anzichè "impuntarsi"
+                        });
+
+                        var shapeSize = 0.8;
+                        var shapeFactory = [
+                            phys2D.createCircleShape({
+                                radius: (shapeSize / 2),
+                                material: rubberMaterial
+                            }),
+                            phys2D.createPolygonShape({
+                                vertices: phys2D.createBoxVertices(shapeSize, shapeSize),
+                                material: heavyMaterial
+                            }),
+                            phys2D.createPolygonShape({
+                                sensor: true, // in questo modo la "corsa" del player non viene intaccata dal bonus
+                                vertices: phys2D.createRegularPolygonVertices(shapeSize, shapeSize, 3),
+                                material: heavyMaterial
+                            }),
+                            phys2D.createPolygonShape({
+                                vertices: phys2D.createRegularPolygonVertices(shapeSize, shapeSize, 6),
+                                material: rubberMaterial
+                            })
+                        ];
+
+                        // texture rectangles for above shapes.
+                        // OVVERO: COME UTILIZZARE GLI SPRITESHEET A MANO -.-
+                        var textureRectangles = [
+                            [130, 130, 255, 255],
+                            [5, 132, 125, 252],
+                            [131, 3, 251, 123],
+                            [5, 5, 125, 125]
+                        ];
+
+                        var player;
+
+                        function reset() {
+                            // Remove all bodies and constraints from world.
+                            world.clear();
+
+                            // Create a static border body around the stage to stop objects leaving the viewport.
+                            var thickness = 0.0001;
+                            var border = phys2D.createRigidBody({
+                                type: 'static',
+                                shapes: [
+                                    phys2D.createPolygonShape({
+                                        // bordo sinistro
+                                        vertices: phys2D.createRectangleVertices(0, 0, thickness, stageHeight),
+                                        material: borderMaterial
+                                    }),
+                                    phys2D.createPolygonShape({
+                                        // bordo superiore
+                                        vertices: phys2D.createRectangleVertices(0, 0, stageWidth, thickness),
+                                        material: borderMaterial
+                                    }),
+                                    phys2D.createPolygonShape({
+                                        // bordo destro
+                                        vertices: phys2D.createRectangleVertices((stageWidth - thickness), 0, stageWidth, stageHeight),
+                                        material: borderMaterial
+                                    }),
+                                    phys2D.createPolygonShape({
+                                        // bordo inferiore
+                                        // solo nel bordo inferore devono comportarsi normalmente gli oggetti => niente material
+                                        vertices: phys2D.createRectangleVertices(0, (stageHeight - thickness), stageWidth, stageHeight)
+                                    })
+                                ]
+                            });
+                            world.addRigidBody(border);
+
+                            var createPlatform = function createPlatform(x1, y1, x2, y2) {
+
+                                var shapes = [
+                                    phys2D.createPolygonShape({
+                                        vertices: phys2D.createRectangleVertices(x1, y1, x2, y2),
+                                        material: conveyorBeltMaterial
+                                    })
+
+                                ];
+                                var body = phys2D.createRigidBody({
+                                    type: 'static',
+                                    shapes: shapes
+                                });
+
+                                body.isPlatform = true;
+                                body.top = y1;
+                                body.bottom = y2;
+                                body.right = x2;
+                                body.left = x1;
+
+
+                                return body;
+                            };
+
+                            // creiamo ed aggiungiamo le piattaforme al mondo
+                            world.addRigidBody(createPlatform(0, stageHeight - 0.5, stageWidth, stageHeight));
+                            world.addRigidBody(createPlatform(7, 5, 18, 5.5));
+                            world.addRigidBody(createPlatform(20, 9, 30, 9.5));
+                            world.addRigidBody(createPlatform(0, 10, 7, 10.5));
+                            world.addRigidBody(createPlatform(12, 13, 20, 13.5));
+                            world.addRigidBody(createPlatform(2, 17, 10, 17.5));
+                            world.addRigidBody(createPlatform(18, 17, 25, 17.5));
+
+
+                            player = phys2D.createRigidBody({
+                                shapes: [shapeFactory[1].clone()],
+                                position: [stageWidth / 2, stageHeight / 2],
+                                userData: Draw2DSprite.create({
+                                    width: shapeSize,
+                                    height: shapeSize,
+                                    origin: [shapeSize / 2, shapeSize / 2],
+                                    textureRectangle: textureRectangles[1],
+                                    texture: draw2DTexture
+                                })
+                            });
+
+                            player.score = 0;
+                            player.isJumping = false;
+
+                            player.shapes[0].addEventListener("begin", function (arbiter, shape) {
+
+                                console.log();
+
+                                if (shape.body.isBonus) {
+                                    player.score += 10;
+                                    world.removeRigidBody(bonus);
+                                    bonus = null;
+                                } else if (arbiter.bodyA.isPlatform || arbiter.bodyA.isFloor) {
+                                    // in questo if uso arbiter.bodyA
+                                    // perchè le piattaforme non hanno shape xD
+                                    var contactPosition = arbiter.contacts[0].getPosition();
+
+                                    // console.log(arbiter.bodyA);
+                                    // console.log(contactPosition);
+
+                                    if (contactPosition[1] - arbiter.bodyA.top <= 0.1) {
+                                        player.isJumping = false;
+                                    }
+                                }
+
+                            });
+
+                            world.addRigidBody(player);
+
+                        }
+
+                        function getBonusPosition() {
+
+                            var isGood = false;
+                            var result;
+                            var tempPoint = {};
+                            var i;
+                            while (!isGood) {
+
+                                result = [Math.random() * stageWidth, Math.random() * stageHeight];
+
+                                tempPoint.topLeft = [result[0] - shapeSize / 2, result[1] - shapeSize / 2];
+                                tempPoint.topRight = [result[0] + shapeSize / 2, result[1] - shapeSize / 2];
+                                tempPoint.bottomLeft = [result[0] - shapeSize / 2, result[1] + shapeSize / 2];
+                                tempPoint.bottomRight = [result[0] + shapeSize / 2, result[1] + shapeSize / 2];
+
+                                for (i = 0; i < world.rigidBodies.length; i++) {
+                                    if (collisionUtils.containsPoint(world.rigidBodies[i].shapes[0], tempPoint.topLeft)
+                                            || collisionUtils.containsPoint(world.rigidBodies[i].shapes[0], tempPoint.topRight)
+                                            || collisionUtils.containsPoint(world.rigidBodies[i].shapes[0], tempPoint.bottomLeft)
+                                            || collisionUtils.containsPoint(world.rigidBodies[i].shapes[0], tempPoint.bottomRight)) {
+                                        break;
+                                    }
+                                }
+
+                                if (i >= world.rigidBodies.length) {
+                                    isGood = true;
+                                }
+                            }
+
+                            return result;
+                        }
+
+
+                        //==========================================================================
+                        // Mouse/Keyboard controls
+                        //==========================================================================
+                        var inputDevice = TurbulenzEngine.createInputDevice({});
+                        var keyCodes = inputDevice.keyCodes;
+                        var controls = {};
+
+                        var onKeyUp = function onKeyUpFn(keynum) {
+
+                            switch (keynum) {
+                                case keyCodes.R:
+                                    reset();
+                                    break;
+                                case keyCodes.RIGHT:
+                                    controls.right = false;
+                                    break;
+                                case keyCodes.LEFT:
+                                    controls.left = false;
+                                    break;
+                                case keyCodes.UP:
+                                    controls.up = false;
+                                    break;
+                                case keyCodes.DOWN:
+                                    controls.down = false;
+                                    break;
+                            }
+                        };
+                        inputDevice.addEventListener('keyup', onKeyUp);
+
+                        var onKeyDown = function onKeyDownFn(keynum) {
+
+                            switch (keynum) {
+
+                                case keyCodes.RIGHT:
+                                    controls.right = true;
+                                    break;
+                                case keyCodes.LEFT:
+                                    controls.left = true;
+                                    break;
+                                case keyCodes.DOWN:
+                                    controls.down = true;
+                                    break;
+                                case keyCodes.UP:
+                                    controls.up = true;
+                                    if (!player.isJumping) {
+                                        player.setVelocity([0, -15]);
+                                        player.isJumping = true;
+                                    }
+                                    break;
+                            }
+                        };
+                        inputDevice.addEventListener('keydown', onKeyDown);
+
+                        //==========================================================================
+                        // Main loop.
+                        //==========================================================================
+                        var fpsElement = document.getElementById("fpscounter");
+                        var lastFPS = "";
+
+                        var bodiesElement = document.getElementById("bodiescounter");
+                        var lastNumBodies = 0;
+
+                        var realTime = 0;
+                        var prevTime = TurbulenzEngine.time;
+
+                        var bonus;
+
+                        var fontTechnique, fontTechniqueParameters; //
+
+                        var createdBonusTime;
+
+                        function mainLoop() {
+                            if (!graphicsDevice.beginFrame()) {
+                                return;
+                            }
+
+                            inputDevice.update();
+                            graphicsDevice.clear([0.3, 0.3, 0.3, 1.0]);
+
+                            var body;
+                            var curTime = TurbulenzEngine.time;
+                            var timeDelta = (curTime - prevTime);
+
+                            if (timeDelta > (1 / 20)) {
+                                timeDelta = (1 / 20);
+                            }
+                            realTime += timeDelta;
+                            prevTime = curTime;
+
+                            while (world.simulatedTime < realTime) {
+
+                                if (!bonus) {
+                                    // creiamo il bonus
+                                    bonus = phys2D.createRigidBody({
+                                        type: "static",
+                                        shapes: [shapeFactory[2].clone()],
+                                        position: getBonusPosition(),
+                                        userData: Draw2DSprite.create({
+                                            width: shapeSize,
+                                            height: shapeSize,
+                                            origin: [shapeSize / 2, shapeSize / 2],
+                                            textureRectangle: textureRectangles[2],
+                                            texture: draw2DTexture
+                                        })
+                                    });
+
+                                    bonus.isBonus = true;
+
+                                    world.addRigidBody(bonus);
+
+                                    createdBonusTime = curTime;
+                                } else if (curTime - createdBonusTime > 5) {
+                                    // se non lo prendo in 5 secondi
+                                    // lo distruggo
+                                    world.removeRigidBody(bonus);
+                                    bonus = null;
+                                }
+
+                                // input control
+                                if (controls.right) {
+                                    var vel = player.getVelocity();
+                                    player.setVelocity([7, vel[1]]);
+                                } else if (controls.left) {
+                                    var vel = player.getVelocity();
+                                    player.setVelocity([-7, vel[1]]);
+
+                                }
+
+                                if (controls.down) {
+                                    player.setVelocity([0, 25]);
+                                }
+
+                                world.step(1 / 60);
+                            }
+
+
+                            // Draw fonts.
+                            graphicsDevice.setTechnique(fontTechnique);
+                            fontTechniqueParameters.clipSpace = mathDevice.v4Build(2 / graphicsDevice.width, -2 / graphicsDevice.height, -1, 1, fontTechniqueParameters.clipSpace);
+                            graphicsDevice.setTechniqueParameters(fontTechniqueParameters);
+
+                            function segmentFont(x, y, text, height) {
+                                var topLeft = draw2D.viewportUnmap(x, y);
+                                var bottomRight = draw2D.viewportUnmap(x + 3, y + height);
+                                font.drawTextRect(text, {
+                                    rect: [topLeft[0], topLeft[1], bottomRight[0] - topLeft[0], bottomRight[1] - topLeft[1]],
+                                    scale: 1.0,
+                                    spacing: 0,
+                                    alignment: 1
+                                });
+                            }
+
+                            var titleHeight = 0.75;
+                            segmentFont(1, 1, "Score: " + player.score, titleHeight);
+
+
+                            // draw2D sprite drawing.
+                            var bodies = world.rigidBodies;
+                            var limit = bodies.length;
+                            var i;
+                            if (!debugEnabled) {
+                                draw2D.begin('alpha', 'deferred');
+                                var pos = [];
+                                for (i = 0; i < limit; i += 1) {
+                                    body = bodies[i];
+                                    if (body.userData) {
+                                        body.getPosition(pos);
+                                        var sprite = body.userData;
+                                        sprite.x = pos[0];
+                                        sprite.y = pos[1];
+                                        sprite.rotation = body.getRotation();
+                                        draw2D.drawSprite(sprite);
+                                    }
+                                }
+                                draw2D.end();
+                            }
+
+                            // physics2D debug drawing.
+                            debug.setScreenViewport(draw2D.getScreenSpaceViewport());
+                            debug.showRigidBodies = debugEnabled;
+                            debug.showContacts = contactsEnabled;
+
+                            debug.begin();
+                            if (!debugEnabled) {
+                                for (i = 0; i < limit; i += 1) {
+                                    body = bodies[i];
+                                    if (!body.userData) {
+                                        debug.drawRigidBody(body);
+                                    }
+                                }
+                            }
+                            debug.drawWorld(world);
+                            debug.end();
+
+                            graphicsDevice.endFrame();
+
+                            if (fpsElement) {
+                                var fpsText = (graphicsDevice.fps).toFixed(2);
+                                if (lastFPS !== fpsText) {
+                                    lastFPS = fpsText;
+
+                                    fpsElement.innerHTML = fpsText + " fps";
+                                }
+                            }
+
+                            if (bodiesElement) {
+                                if (lastNumBodies !== limit) {
+                                    lastNumBodies = limit;
+
+                                    bodiesElement.innerHTML = lastNumBodies + "";
+                                }
+                            }
+                        }
+
+                        var intervalID;
+                        function loadingLoop() {
+
+                            if (draw2DTexture && font && shader && bgSound) {
+
+                                reset();
+
+                                fontTechnique = shader.getTechnique('font');
+                                fontTechniqueParameters = graphicsDevice.createTechniqueParameters({
+                                    clipSpace: mathDevice.v4BuildZero(),
+                                    alphaRef: 0.01,
+                                    color: mathDevice.v4BuildOne()
+                                });
+
+                                bgSource.play(bgSound);
+
+                                TurbulenzEngine.clearInterval(intervalID);
+                                intervalID = TurbulenzEngine.setInterval(mainLoop, 1000 / 60);
+                            }
+                        }
+                        intervalID = TurbulenzEngine.setInterval(loadingLoop, 10);
+
+                        //==========================================================================
+                        function loadHtmlControls() {
+                            htmlControls = HTMLControls.create();
+                            htmlControls.addCheckboxControl({
+                                id: "enableDebug",
+                                value: "debugEnabled",
+                                isSelected: debugEnabled,
+                                fn: function () {
+                                    debugEnabled = !debugEnabled;
+                                    return debugEnabled;
+                                }
+                            });
+                            htmlControls.addCheckboxControl({
+                                id: "enableContacts",
+                                value: "contactsEnabled",
+                                isSelected: contactsEnabled,
+                                fn: function () {
+                                    contactsEnabled = !contactsEnabled;
+                                    return contactsEnabled;
+                                }
+                            });
+                            htmlControls.register();
+                        }
+
+                        loadHtmlControls();
+                    } // FINE else
+
+
+                    // Create a scene destroy callback to run when the window is closed
+                    TurbulenzEngine.onunload = function destroyScene() {
+                        if (intervalID) {
+                            TurbulenzEngine.clearInterval(intervalID);
+                        }
+
+                        if (gameSession) {
+                            gameSession.destroy();
+                            gameSession = null;
+                        }
+                    };
+                };
+
+                // Engine startup
+                window.onload = function ()
+                {
+                    var appEntry = TurbulenzEngine.onload;
+                    var appShutdown = TurbulenzEngine.onunload;
+                    if (!appEntry) {
+                        window.alert("TurbulenzEngine.onload has not been set");
+                        return;
+                    }
+
+                    var canvas =
+                            document.getElementById('canvas');
+
+                    var startCanvas = function startCanvasFn()
+                    {
+                        if (canvas.getContext && canvasSupported)
+                        {
+                            TurbulenzEngine = WebGLTurbulenzEngine.create({
+                                canvas: canvas,
+                                fillParent: true
+                            });
+
+                            if (!TurbulenzEngine) {
+                                window.alert("Failed to init TurbulenzEngine (canvas)");
+                                return;
+                            }
+
+                            TurbulenzEngine.onload = appEntry;
+                            TurbulenzEngine.onunload = appShutdown;
+                            appEntry();
+                        }
+                    };
+
+                    var previousOnBeforeUnload = window.onbeforeunload;
+                    window.onbeforeunload = function ()
+                    {
+                        if (TurbulenzEngine.onunload) {
+                            TurbulenzEngine.onunload.call(this);
+                        }
+                    };  // window.beforeunload
+
+                    startCanvas();
+                };  // window.onload()
+
+        </script>
+
+    </body>
+</html>

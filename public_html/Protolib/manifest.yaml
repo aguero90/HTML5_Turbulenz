@@ -1,0 +1,17 @@
+aspect_ratio: '16:9'
+canvas_main: ''
+cover_art: 'cover_art.png'
+deploy_files: []
+deployed: Never
+engine_version: '0.28'
+flash_main: ''
+has_notifications: false
+is_multiplayer: false
+is_temp: false
+mapping_table: 'mapping_table.json'
+modified: 09:19 | 07/02/2015
+path: C:\Turbulenz\Turbulenz\public_html\Protolib
+plugin_main: ''
+slug: protolib
+title: Protolib
+title_logo: ''

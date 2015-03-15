@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <title>Turbulenz - Getting Started Guide - API Example</title>
+        <!-- Script includes go here -->
+        <script src="jslib/debug.js"></script>
+        <script src="jslib/webgl/turbulenzengine.js"></script>
+        <script src="jslib/webgl/graphicsdevice.js"></script>
+        <script src="jslib/draw2d.js"></script>
+    </head>
+
+    <body>
+        <canvas id="canvas" width="640" height="480"></canvas>
+        <script>
+            /* Game code goes here */
+            // La variabile "TurbulenzEngine" permette di istanziare i moduli di basso livello come
+            // GraphicsDevice, SoundDevice, NetworkDevice, InputDevice and PhysicsDevice.
+            // Possiamo essere certi dell'esistenza delle variabili per il debug e della variabile "TurbulenzEngine"
+            // poiche vengono aggiunte automaticamente dai tools di Turbulenz
+
+            // ma in questo esempio creeremo tutto manualmente
+            TurbulenzEngine = WebGLTurbulenzEngine.create({
+                canvas: document.getElementById("canvas")
+            });
+
+            // il costruttore prende in input un oggetto contenente le proprietà
+            // da usare, ma in questo caso usiamo un oggetto vuoto
+            var graphicsDevice = TurbulenzEngine.createGraphicsDevice({});
+
+            // soltanto dopo aver creato GraphicsDevice possiamo creare Draw2D:
+            // Draw2D dipende da GraphicDevice!
+            // infatti, al momento della creazione, nel costruttore passiamo un oggetto
+            // contenente una proprietà che ha come valore il riferimento all'oggetto
+            // GraphicDevice istanziato
+            var draw2D = Draw2D.create({
+                graphicsDevice: graphicsDevice
+            });
+
+            // Adesso che abbiamo creato il modulo graphicsDevice, l'elemento <canvas>
+            // può essere riempito con un colore
+            var r = 1.0,
+                    g = 1.0,
+                    b = 0.0,
+                    a = 1.0; // rgba l'intervallo di ogni elemento è [0.0 - 1.0]
+            var bgColor = [r, g, b, a]; // vettore a 4 componenti
+
+            // ora che abbiamo il colore di sfondo andiamo a costruire il rettangolo da disegnare
+            // grazie al modulo Draw2D
+            var x1 = 50; // coordinata x dell'angolo superiore sinistro del rettangolo
+            var y1 = 50; // coordinata y dell'angolo superiore sinistro del rettangolo
+            var x2 = graphicsDevice.width - 50; // coordinata x dell'angolo inferiore destro del rettangolo
+            var y2 = graphicsDevice.height - 50; // coordinata x dell'angolo inferiore destro del rettangolo
+
+            var rectangle = [x1, y1, x2, y2]; // creiamo un vettore con 4 componenti che identifica il rettangolo
+
+            // creiamo l'oggetto da disegnare tramite Draw2D
+            var drawObject = {
+                color: [1.0, 0.0, 0.0, 1.0], // qui assegnamo il colore all'oggetto
+                destinationRectangle: rectangle // qui assegnamo la forma all'oggetto
+            };
+
+            // ovviamente in un gioco per avere più controllo e flessibilità dobbiamo usare gli sprite!
+            // grazie a Draw2D possiamo facilmente creare degli sprite
+            // NOTA: possiamo modificare i valori degli sprite tramite i getter e i setter ( es: getColor(), setColor() ) o,
+            // per quanto riguarda la posizione dello sprite, tramite le proprietà dell'oggetto sprite
+            var sprite = Draw2DSprite.create({
+                width: 100,
+                height: 100,
+                x: graphicsDevice.width / 2,
+                y: graphicsDevice.height / 2,
+                color: [1.0, 1.0, 1.0, 1.0],
+                rotation: Math.PI / 4 // ruotiamo di 45° il cerchio
+            });
+
+
+            // Ora che abbiamo uno sprite possiamo agganciare ad esso una texture
+            // per dargli l'aspetto grafico desiderato
+            // NOTA: Draw2D necessita che la texture sia in "potenze di 2" ( es: 16x16, 64x32, 128x512, etc )
+            //          e che "mipmaps" sia impostata a true
+            var texture = graphicsDevice.createTexture({
+                src: "assets/textures/Goomba.png", // formati supportati: png, jpg, dds, tga
+                mipmaps: true,
+                onload: function (texture) { // callback da eseguire nel momento in cui la texture è stata caricata
+                    if (texture) {
+                        sprite.setTexture(texture);
+                        sprite.setTextureRectangle([0, 0, texture.width, texture.height]);
+                    }
+                }
+            });
+
+            // variabili da usare per la rotazione dello sprite
+            var PI2 = Math.PI * 2; // 360°
+            var rotateAngle = Math.PI / 32; // 5,6°
+
+            // È possibile modificare le dimensioni di uno sprite in vari modi, ad esmpio utilizzando
+            // "scale"
+            var scale = [1, 1];
+
+            // definiamo la funzione update() che sarà il nostro game loop
+            function update() {
+                /* Update code goes here */
+
+                // modifichiamo il colore di sfondo ad ogni update
+                // sembrerà che lo sfondo abbia un animazione che gli fa cambiare colore
+                b += 0.01;
+                bgColor[2] = b % 1; // per restare nell'intervallo [0.0 - 1.0]
+
+                // modifichiamo l'angolo di rotazione dello sprite ad ogni update
+                // sembrerà che lo sprite stia ruotando
+                sprite.rotation += rotateAngle;
+                sprite.rotation %= PI2; // per restare tra 0° e 360° ( 2PI )
+
+                // modifichiamo la dimensione dello sprite in modo random
+                // così da dare l'impressione che venga zoomato e de-zoomato
+                // poichè a 2 andermo ad aggiungere l'andamento del coseno
+                // quindi otterremo sempre valori tra 1 e 3
+                scale[0] = scale[1] = Math.cos(sprite.rotation) + 2;
+                sprite.setScale(scale);
+
+                if (graphicsDevice.beginFrame()) {
+                    graphicsDevice.clear(bgColor, 1.0); // riempiamo il nostro canvas con il colore scelto
+                    /* Rendering code goes here */
+
+                    // draw2D.begin(); // avremmo lo sprite opaco
+                    // draw2D.begin("additive"); // per rendere anche lo sprite trasparente
+                    draw2D.begin("alpha"); // da usare se lo sprite ha già lo sfondo trasparente
+                    draw2D.draw(drawObject); // mettiamo a video l'oggetto da disegnare
+                    draw2D.drawSprite(sprite); // mettiamo a video lo sprite
+                    // NOTA: l'ultimo elemento disegnato sarà quello con z-index minore (cioè quello sopra di tutti)
+                    draw2D.end();
+
+                    graphicsDevice.endFrame();
+                }
+            }
+
+            TurbulenzEngine.setInterval(update, 1000 / 60); // 60 FPS
+        </script>
+    </body>
+
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Multi Chat - Samples - Turbulenz Engine</title>
+    <link rel="stylesheet" type="text/css" href="css/base_template.css">
+    <link rel="shortcut icon" href="img/favicon.ico">
+    
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+    <style>
+        #turbulenz_game_engine_object {
+            height: 0;
+        }
+        #log {
+            color:black;
+            background:white;
+            width:100%;
+            overflow:auto;
+            border:1px black;
+            font-family:monospace;
+            overflow: auto;
+            position: absolute;
+            top: 25px;
+            bottom: 0;
+        }
+        #log ul {
+            padding: 0;
+            margin: 0;
+        }
+
+        #log ul li {
+            list-style: none;
+            clear: both;
+        }
+        #log ul li .time-message {
+            color: gray;
+            font-weight: bold;
+            float: left;
+            width: 170px;
+        }
+        #log ul li .user-message {
+            font-weight: bold;
+            float: left;
+            width: 70px;
+        }
+        #log ul li .text-message {
+            padding-left: 240px;
+            word-wrap: break-word;
+        }
+        #log .system-message{
+            color: gray;
+            padding-left: 170px;
+            padding-right: 5px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div id="titlebar" class="ui-layout-north">
+        <strong class="title">Multi Chat</strong>
+        <div id="titlelogo"></div>
+    </div>
+    <div id="sidebar" class="ui-layout-west scrollable">
+        <!-- tz_app_html_controls -->
+        <div class="html-control control-output-pair">
+            Alias:
+            <input type="button" id="buttonalias" value="Change" class="control-output" style="margin-top:13px;">
+            <input type="text" id="buttonaliasinput" class="control-textfield" maxlength="8">
+        </div>
+        <!-- end tz_app_html_controls -->
+        <!-- tz_engine_controls -->
+        
+        
+        <!-- tz_engine_controls -->
+    </div>
+    <div id="engine" class="ui-layout-center">
+        <input type="button" id="sendmessage" value="Send">
+        <div style="position: absolute; left: 60px; right: 0; top: 0;">
+            <input type="text" id="messageinput" maxlength="100" style="width:99%;">
+        </div>
+        <div id="log">
+            <ul id="loglist">
+            </ul>
+        </div>
+        <div style="width: 1px; height: 1px;">
+            
+        <canvas id="turbulenz_game_engine_canvas" moz-opaque="true" tabindex="1">
+            Sorry, but your browser does not support WebGL or does not have it
+            enabled.  To get a WebGL-enabled browser, please see:<br/>
+            <a href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" target="_blank">
+                Getting a WebGL Implementation
+            </a>
+        </canvas>
+
+        <script type="text/javascript">
+            var canvasSupported = true;
+            (function()
+            {
+                var contextNames = ["webgl", "experimental-webgl"];
+                var context = null;
+                var canvas = document.createElement('canvas');
+
+                document.body.appendChild(canvas);
+
+                for (var i = 0; i < contextNames.length; i += 1)
+                {
+                    try {
+                        context = canvas.getContext(contextNames[i]);
+                    } catch (e) {}
+
+                    if (context) {
+                        break;
+                    }
+                }
+                if (!context)
+                {
+                    canvasSupported = false;
+                    window.alert("Sorry, but your browser does not support WebGL or does not have it enabled.");
+                }
+
+                document.body.removeChild(canvas);
+            }());
+            var TurbulenzEngine = {};
+        </script>
+        </div>
+
+    </div>
+
+    <!-- begin 'tz_include_js' variable -->
+    <script type="text/javascript" src="jslib/debug.js"></script>
+<script type="text/javascript" src="jslib/vmath.js"></script>
+<script type="text/javascript" src="jslib/utilities.js"></script>
+<script type="text/javascript" src="jslib/aabbtree.js"></script>
+<script type="text/javascript" src="jslib/observer.js"></script>
+<script type="text/javascript" src="jslib/webgl/ddsloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/graphicsdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/inputdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/mathdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/networkdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/physicsdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/sounddevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/soundtarloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/tarloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/tgaloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/touch.js"></script>
+<script type="text/javascript" src="jslib/webgl/touchevent.js"></script>
+<script type="text/javascript" src="jslib/webgl/turbulenzengine.js"></script>
+<script type="text/javascript" src="scripts/htmlcontrols.js"></script>
+    <!-- end 'tz_include_js' variable -->
+
+    <script type="text/javascript">
+      // ----------------------------------------
+      // Embedded code and startup code.
+      // Supplied by 'tz_startup_code' variable.
+      // ----------------------------------------
+      
+/*
+* @title: Chat
+* @description:
+* A sample showing how to create and use websockets with the Turbulenz network device.
+*/
+
+
+/*global window: false */
+/*global TurbulenzEngine: true */
+TurbulenzEngine.onload = function onloadFn() {
+    var errorCallback = function errorCallback(msg) {
+        window.alert(msg);
+    };
+    TurbulenzEngine.onerror = errorCallback;
+
+    // Prepare WebSocket
+    var host = document.location.host;
+    if (host.indexOf('.com') !== -1) {
+        window.alert('This example works only on the Turbulenz Local Server.');
+        return;
+    }
+
+    var id = Math.floor(Math.random() * 999).toString();
+    var alias = "User" + id;
+    var chatURL = "ws://" + host + "/multiplayer/multichat/" + id;
+    var websocket;
+
+    var networkDeviceParameters = {};
+    var networkDevice = TurbulenzEngine.createNetworkDevice(networkDeviceParameters);
+
+    function htmlEncode(text) {
+        var EN_AMP_RE = /&/g;
+        var EN_LT_RE = /</g;
+        var EN_GT_RE = />/g;
+        var EN_QUOT_RE = /"/g;
+        var EN_SINGLE_RE = /'/g;
+
+        text = "" + text;
+        text = text.toString().replace(EN_AMP_RE, "&amp;");
+        text = text.replace(EN_LT_RE, "&lt;");
+        text = text.replace(EN_GT_RE, "&gt;");
+        text = text.replace(EN_QUOT_RE, "&quot;");
+        text = text.replace(EN_SINGLE_RE, "&#39;");
+        return text;
+    }
+
+    // Logging window
+    var logElement = document.getElementById("log");
+    var logListElement = document.getElementById("loglist");
+    if (!logListElement) {
+        // Probably running on TZJS only mode
+        window.alert('Please run the HTML version of this sample.');
+        return;
+    }
+
+    function padNumber(value) {
+        return ("0" + value).slice(-2);
+    }
+
+    function getTimeString() {
+        var d = new Date();
+        return "[" + d.getFullYear() + "-" + padNumber(d.getMonth() + 1) + "-" + padNumber(d.getDate()) + " " + padNumber(d.getHours()) + ":" + padNumber(d.getMinutes()) + ":" + padNumber(d.getSeconds()) + "] ";
+    }
+
+    function addToLog(message) {
+        var newEntry = document.createElement('li');
+        var content = '<div class="time-message">' + getTimeString() + '</div>';
+        var usernameEnd = message.indexOf(">>>");
+        if (usernameEnd === -1) {
+            content += ('<div class="system-message">' + message + '</div>');
+        } else {
+            var username = message.slice(0, usernameEnd);
+            message = message.slice(usernameEnd + 3);
+            content += ('<div class="user-message">' + username + '</div>' + '<div class="text-message">' + message + '</div>');
+        }
+        newEntry.innerHTML += content;
+        logListElement.appendChild(newEntry);
+        logElement.scrollTop = logElement.scrollHeight;
+    }
+
+    var messageElement = (document.getElementById("messageinput"));
+    if (messageElement) {
+        messageElement.focus();
+
+        var sendElement = (document.getElementById("sendmessage"));
+        if (sendElement) {
+            var sendMessage = function sendMessageFn() {
+                var messageText = messageElement.value;
+                if (messageText) {
+                    messageText = (alias + ">>>" + htmlEncode(messageText));
+                    websocket.send(":" + messageText);
+                    addToLog(messageText);
+                    messageElement.value = "";
+                    messageElement.focus();
+                }
+            };
+
+            messageElement.onkeyup = function (evt) {
+                if (!evt) {
+                    if (typeof event === "undefined") {
+                        if (!window.event) {
+                            return false;
+                        }
+                        evt = window.event;
+                    } else {
+                        evt = event;
+                    }
+                }
+                if (evt.keyCode === 13) {
+                    sendMessage();
+                }
+                return false;
+            };
+
+            sendElement.onclick = function () {
+                sendMessage();
+            };
+            sendElement = null;
+        }
+    }
+
+    // Change alias
+    var aliasElement = (document.getElementById("buttonaliasinput"));
+    if (aliasElement) {
+        aliasElement.value = alias;
+    }
+
+    var changeAliasElement = (document.getElementById("buttonalias"));
+    if (changeAliasElement) {
+        changeAliasElement.onclick = function () {
+            if (aliasElement) {
+                var newAlias = htmlEncode(aliasElement.value);
+                if (alias !== newAlias) {
+                    websocket.send(':"' + alias + '" is now "' + newAlias + '"');
+                    addToLog('You are now "' + newAlias + '"');
+                    alias = newAlias;
+                }
+            }
+        };
+        changeAliasElement = null;
+    }
+
+    //
+    // Connect to the chat room
+    //
+    function connect() {
+        try  {
+            websocket = networkDevice.createWebSocket(chatURL);
+
+            if (!websocket) {
+                window.alert("Sorry, but your browser does not support WebSocket or does not have it enabled.");
+                return;
+            }
+
+            websocket.onopen = function () {
+                websocket.send(':"' + alias + '" has joined');
+                addToLog('Connected to chat room as "' + alias + '"');
+            };
+
+            websocket.onerror = function () {
+                addToLog('Connection to the chat room is broken! Trying again in 10 seconds.');
+                TurbulenzEngine.setTimeout(connect, 10000);
+                websocket.onopen = null;
+                websocket.onerror = null;
+                websocket.onclose = null;
+                websocket.onmessage = null;
+                websocket = null;
+            };
+
+            websocket.onclose = function () {
+                addToLog('Connection to the chat room was closed! Trying again in 1 second.');
+                TurbulenzEngine.setTimeout(connect, 1000);
+                websocket.onopen = null;
+                websocket.onerror = null;
+                websocket.onclose = null;
+                websocket.onmessage = null;
+                websocket = null;
+            };
+
+            websocket.onmessage = function (message) {
+                message = message.data;
+                var sourceSplitIndex = message.indexOf(':');
+                message = message.slice(sourceSplitIndex + 1);
+                addToLog(message);
+            };
+        } catch (exp) {
+            addToLog('Connection to the chat room failed! Trying again in 10 seconds.');
+            TurbulenzEngine.setTimeout(connect, 10000);
+        }
+    }
+
+    connect();
+
+    //
+    // Update:
+    //
+    function update() {
+        networkDevice.update();
+    }
+
+    var intervalID = TurbulenzEngine.setInterval(update, 1000 / 60);
+
+    TurbulenzEngine.onunload = function destroyScene() {
+        // Clear the interval to stop update from being called
+        TurbulenzEngine.clearInterval(intervalID);
+
+        if (websocket) {
+            // Order is important for a clean shutdown
+            websocket.onopen = null;
+            websocket.onerror = null;
+            websocket.onclose = null;
+            websocket.onmessage = null;
+            websocket.send(':"' + alias + '" has left');
+            websocket = null;
+        }
+
+        // Clear any references to memory
+        messageElement = null;
+        logListElement = null;
+        logElement = null;
+        aliasElement = null;
+        networkDevice = null;
+
+        // Tell the Turbulenz Engine to force the js virtual machine
+        // to free as much memory as possible
+        TurbulenzEngine.flush();
+
+        TurbulenzEngine.onunload = null;
+    };
+};
+
+        // Engine startup
+        window.onload = function ()
+        {
+            var appEntry = TurbulenzEngine.onload;
+            var appShutdown = TurbulenzEngine.onunload;
+            if (!appEntry) {
+                window.alert("TurbulenzEngine.onload has not been set");
+                return;
+            }
+
+            var canvas =
+                document.getElementById('turbulenz_game_engine_canvas');
+
+            var startCanvas = function startCanvasFn()
+            {
+                if (canvas.getContext && canvasSupported)
+                {
+                    TurbulenzEngine = WebGLTurbulenzEngine.create({
+                        canvas: canvas,
+                        fillParent: true
+                    });
+
+                    if (!TurbulenzEngine) {
+                        window.alert("Failed to init TurbulenzEngine (canvas)");
+                        return;
+                    }
+
+                    TurbulenzEngine.onload = appEntry;
+                    TurbulenzEngine.onunload = appShutdown;
+                    appEntry()
+                }
+            }
+
+            var previousOnBeforeUnload = window.onbeforeunload;
+            window.onbeforeunload = function ()
+            {
+                if (TurbulenzEngine.onunload) {
+                    TurbulenzEngine.onunload.call(this);
+                }
+            };  // window.beforeunload
+
+            startCanvas();
+        };  // window.onload()
+
+    </script>
+
+
+</body>
+</html>

@@ -1,0 +1,156 @@
+{"frames": [
+
+{
+	"filename": "p1_duck.png",
+	"frame": {"x":2,"y":2,"w":69,"h":71},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":69,"h":71},
+	"sourceSize": {"w":69,"h":71},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_front.png",
+	"frame": {"x":73,"y":2,"w":66,"h":92},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":66,"h":92},
+	"sourceSize": {"w":66,"h":92},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_hurt.png",
+	"frame": {"x":141,"y":2,"w":69,"h":92},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":69,"h":92},
+	"sourceSize": {"w":69,"h":92},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_jump.png",
+	"frame": {"x":212,"y":2,"w":67,"h":94},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":67,"h":94},
+	"sourceSize": {"w":67,"h":94},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_stand.png",
+	"frame": {"x":281,"y":2,"w":66,"h":92},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":66,"h":92},
+	"sourceSize": {"w":66,"h":92},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_walk01.png",
+	"frame": {"x":349,"y":2,"w":72,"h":97},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":97},
+	"sourceSize": {"w":72,"h":97},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_walk02.png",
+	"frame": {"x":423,"y":2,"w":72,"h":97},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":97},
+	"sourceSize": {"w":72,"h":97},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_walk03.png",
+	"frame": {"x":2,"y":101,"w":72,"h":97},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":97},
+	"sourceSize": {"w":72,"h":97},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_walk04.png",
+	"frame": {"x":76,"y":101,"w":72,"h":97},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":97},
+	"sourceSize": {"w":72,"h":97},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_walk05.png",
+	"frame": {"x":150,"y":101,"w":72,"h":97},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":97},
+	"sourceSize": {"w":72,"h":97},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_walk06.png",
+	"frame": {"x":224,"y":101,"w":72,"h":97},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":97},
+	"sourceSize": {"w":72,"h":97},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_walk07.png",
+	"frame": {"x":298,"y":101,"w":72,"h":97},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":97},
+	"sourceSize": {"w":72,"h":97},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_walk08.png",
+	"frame": {"x":372,"y":101,"w":72,"h":97},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":97},
+	"sourceSize": {"w":72,"h":97},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_walk09.png",
+	"frame": {"x":2,"y":200,"w":72,"h":97},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":97},
+	"sourceSize": {"w":72,"h":97},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_walk10.png",
+	"frame": {"x":76,"y":200,"w":72,"h":97},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":97},
+	"sourceSize": {"w":72,"h":97},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "p1_walk11.png",
+	"frame": {"x":150,"y":200,"w":72,"h":97},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":72,"h":97},
+	"sourceSize": {"w":72,"h":97},
+	"pivot": {"x":0.5,"y":0.5}
+}],
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "PlayerTurb.png",
+	"format": "RGBA8888",
+	"size": {"w":512,"h":512},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:c1fdcb1089013bacb8b8d28f42806736:b9f695f7346acbc30c61b28e28e4ddbb:d2ef739bd329cfc72d2e3f28ac43ff73$"
+}
+}

@@ -1,0 +1,226 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>Device Initialization - Samples - Turbulenz Engine</title>
+    <link rel="stylesheet" type="text/css" href="css/base_template.css">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+</head>
+<body>
+    <div id="titlebar" class="ui-layout-north">
+        <strong class="title">Device Initialization</strong>
+        <div id="titlelogo"></div>
+    </div>
+    <div id="init-details" class="ui-layout-south scrollable">
+        <div id="pl_details"></div>
+        <div id="sys_details"></div>
+        <div id="id_details"></div>
+        <div id="pd_details"></div>
+        <div id="sd_details"></div>
+        <div id="gd_details"></div>
+    </div>
+    <div id="engine-wrapper" style="height: 1px; width: 1px;">
+        <!--
+          HTML to create a plugin or canvas instance.
+          Supplied by 'tz_engine_div' variable.
+        -->
+        
+        <canvas id="turbulenz_game_engine_canvas" moz-opaque="true" tabindex="1">
+            Sorry, but your browser does not support WebGL or does not have it
+            enabled.  To get a WebGL-enabled browser, please see:<br/>
+            <a href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" target="_blank">
+                Getting a WebGL Implementation
+            </a>
+        </canvas>
+
+        <script type="text/javascript">
+            var canvasSupported = true;
+            (function()
+            {
+                var contextNames = ["webgl", "experimental-webgl"];
+                var context = null;
+                var canvas = document.createElement('canvas');
+
+                document.body.appendChild(canvas);
+
+                for (var i = 0; i < contextNames.length; i += 1)
+                {
+                    try {
+                        context = canvas.getContext(contextNames[i]);
+                    } catch (e) {}
+
+                    if (context) {
+                        break;
+                    }
+                }
+                if (!context)
+                {
+                    canvasSupported = false;
+                    window.alert("Sorry, but your browser does not support WebGL or does not have it enabled.");
+                }
+
+                document.body.removeChild(canvas);
+            }());
+            var TurbulenzEngine = {};
+        </script>
+    </div>
+
+    <!-- begin 'tz_include_js' variable -->
+    <script type="text/javascript" src="jslib/debug.js"></script>
+<script type="text/javascript" src="jslib/vmath.js"></script>
+<script type="text/javascript" src="jslib/utilities.js"></script>
+<script type="text/javascript" src="jslib/aabbtree.js"></script>
+<script type="text/javascript" src="jslib/observer.js"></script>
+<script type="text/javascript" src="jslib/webgl/ddsloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/graphicsdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/inputdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/mathdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/networkdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/physicsdevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/sounddevice.js"></script>
+<script type="text/javascript" src="jslib/webgl/soundtarloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/tarloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/tgaloader.js"></script>
+<script type="text/javascript" src="jslib/webgl/touch.js"></script>
+<script type="text/javascript" src="jslib/webgl/touchevent.js"></script>
+<script type="text/javascript" src="jslib/webgl/turbulenzengine.js"></script>
+    <!-- end 'tz_include_js' variable -->
+
+    <script type="text/javascript">
+      // ----------------------------------------
+      // Embedded code and startup code.
+      // Supplied by 'tz_startup_code' variable.
+      // ----------------------------------------
+      
+/*
+* @title: Device initialization
+* @description:
+* This sample shows how to create all the Turbulenz devices and how to discover the OS version and the hardware capabilities.
+*/
+/*global TurbulenzEngine: true */
+TurbulenzEngine.onload = function onloadFn() {
+    var systemInfo = TurbulenzEngine.getSystemInfo();
+
+    var graphicsDeviceParameters = {};
+    var graphicsDevice = TurbulenzEngine.createGraphicsDevice(graphicsDeviceParameters);
+
+    var physicsDeviceParameters = {};
+    var physicsDevice = TurbulenzEngine.createPhysicsDevice(physicsDeviceParameters);
+
+    var dynamicsWorldParameters = {};
+    var dynamicsWorld = physicsDevice.createDynamicsWorld(dynamicsWorldParameters);
+
+    var soundDeviceParameters = {};
+    var soundDevice = TurbulenzEngine.createSoundDevice(soundDeviceParameters);
+
+    var inputDeviceParameters = {};
+    var inputDevice = TurbulenzEngine.createInputDevice(inputDeviceParameters);
+
+    var plDiv = document.getElementById("pl_details");
+
+    var write = function (msg, elt) {
+        if (!elt) {
+            elt = plDiv;
+        }
+
+        if (elt) {
+            plDiv.innerHTML += msg;
+        } else {
+            window.console.log(msg);
+        }
+    };
+
+    write("<h3>Turbulenz Engine Details<\/h3>");
+
+    write("<ul>" + "<li>Version: " + TurbulenzEngine.version + "<\/li>" + "<\/ul>");
+
+    var sysDiv = document.getElementById("sys_details");
+
+    write("<h3>System Details<\/h3>", sysDiv);
+
+    write("<ul>" + "<li>CpuDescription: " + systemInfo.cpuDescription + "<\/li>" + "<li>CpuVendor: " + systemInfo.cpuVendor + "<\/li>" + "<li>NumPhysicalCores: " + systemInfo.numPhysicalCores + "<\/li>" + "<li>NumLogicalCores: " + systemInfo.numLogicalCores + "<\/li>" + "<li>RamInMegabytes: " + systemInfo.ramInMegabytes + "<\/li>" + "<li>FrequencyInMegaHz: " + systemInfo.frequencyInMegaHZ + "<\/li>" + "<li>EngineArchitecture: " + systemInfo.architecture + "<\/li>" + "<li>OSName: " + systemInfo.osName + "<\/li>" + "<li>OSVersionMajor: " + systemInfo.osVersionMajor + "<\/li>" + "<li>OSVersionMinor: " + systemInfo.osVersionMinor + "<\/li>" + "<li>OSVersionBuild: " + systemInfo.osVersionBuild + "<\/li>" + "<li>UserLocale: " + systemInfo.userLocale + "<\/li>" + "<\/ul>", sysDiv);
+
+    var gdDiv = document.getElementById("gd_details");
+
+    write("<h3>Graphics Device Details<\/h3>", gdDiv);
+    if (graphicsDevice) {
+        write("<ul>" + "<li>Vendor: " + graphicsDevice.vendor + "<\/li>" + "<li>Renderer: " + graphicsDevice.renderer + "<\/li>" + "<li>Renderer Version: " + graphicsDevice.rendererVersion + "<\/li>" + "<li>Shading Language Version: " + graphicsDevice.shadingLanguageVersion + "<\/li>" + "<li>Video Ram: " + graphicsDevice.videoRam + " MB<\/li>" + "<li>OCCLUSION_QUERIES: " + graphicsDevice.isSupported("OCCLUSION_QUERIES") + " <\/li>" + "<li>NPOT_MIPMAPPED_TEXTURES: " + graphicsDevice.isSupported("NPOT_MIPMAPPED_TEXTURES") + " <\/li>" + "<li>TEXTURE_DXT1: " + graphicsDevice.isSupported("TEXTURE_DXT1") + " <\/li>" + "<li>TEXTURE_DXT3: " + graphicsDevice.isSupported("TEXTURE_DXT3") + " <\/li>" + "<li>TEXTURE_DXT5: " + graphicsDevice.isSupported("TEXTURE_DXT5") + " <\/li>" + "<li>TEXTURE_ETC1: " + graphicsDevice.isSupported("TEXTURE_ETC1") + " <\/li>" + "<li>INDEXFORMAT_UINT: " + graphicsDevice.isSupported("INDEXFORMAT_UINT") + " <\/li>" + "<li>VERTEX_SHADER_PRECISION: " + graphicsDevice.maxSupported("VERTEX_SHADER_PRECISION") + "-bits<\/li>" + "<li>FRAGMENT_SHADER_PRECISION: " + graphicsDevice.maxSupported("FRAGMENT_SHADER_PRECISION") + "-bits<\/li>" + "<li>ANISOTROPY: " + graphicsDevice.maxSupported("ANISOTROPY") + " <\/li>" + "<li>TEXTURE_SIZE: " + graphicsDevice.maxSupported("TEXTURE_SIZE") + " <\/li>" + "<li>CUBEMAP_TEXTURE_SIZE: " + graphicsDevice.maxSupported("CUBEMAP_TEXTURE_SIZE") + " <\/li>" + "<li>3D_TEXTURE_SIZE: " + graphicsDevice.maxSupported("3D_TEXTURE_SIZE") + " <\/li>" + "<li>TEXTURE_UNITS: " + graphicsDevice.maxSupported("TEXTURE_UNITS") + " <\/li>" + "<li>VERTEX_TEXTURE_UNITS: " + graphicsDevice.maxSupported("VERTEX_TEXTURE_UNITS") + " <\/li>" + "<li>RENDERTARGET_COLOR_TEXTURES: " + graphicsDevice.maxSupported("RENDERTARGET_COLOR_TEXTURES") + " <\/li>" + "<li>RENDERBUFFER_SIZE: " + graphicsDevice.maxSupported("RENDERBUFFER_SIZE") + " <\/li>" + "<li>FILEFORMAT_WEBM: " + graphicsDevice.isSupported("FILEFORMAT_WEBM") + " <\/li>" + "<li>FILEFORMAT_MP4: " + graphicsDevice.isSupported("FILEFORMAT_MP4") + " <\/li>" + "<li>FILEFORMAT_JPG: " + graphicsDevice.isSupported("FILEFORMAT_JPG") + " <\/li>" + "<li>FILEFORMAT_PNG: " + graphicsDevice.isSupported("FILEFORMAT_PNG") + " <\/li>" + "<li>FILEFORMAT_DDS: " + graphicsDevice.isSupported("FILEFORMAT_DDS") + " <\/li>" + "<li>FILEFORMAT_TGA: " + graphicsDevice.isSupported("FILEFORMAT_TGA") + " <\/li>" + "<li>Extensions: " + graphicsDevice.extensions + "<\/li>" + "<\/ul>", gdDiv);
+    } else {
+        write("<ul>" + "<li>No GraphicsDevice support<\/li>" + "<\/ul>", gdDiv);
+    }
+
+    var pdDiv = document.getElementById("pd_details");
+
+    write("<h3>Physics Device Details<\/h3>", pdDiv);
+
+    var gravity = dynamicsWorld.gravity;
+    write("<ul>" + "<li>Vendor: " + physicsDevice.vendor + "<\/li>" + "<li>Version: " + physicsDevice.version + "<\/li>" + "<li>MaxSubSteps: " + dynamicsWorld.maxSubSteps + "<\/li>" + "<li>FixedTimeStep: " + dynamicsWorld.fixedTimeStep + "<\/li>" + "<li>Gravity: [" + gravity[0] + ", " + gravity[1] + ", " + gravity[2] + "]<\/li>" + "<\/ul>", pdDiv);
+
+    var sdDiv = document.getElementById("sd_details");
+
+    write("<h3>Sound Device Details<\/h3>", sdDiv);
+
+    if (soundDevice) {
+        var transform = soundDevice.listenerTransform;
+        var transformString = "<li>ListenerTransform: [" + transform[0] + ", " + transform[1] + ", " + transform[2] + ", " + transform[3] + ", " + transform[4] + ", " + transform[5] + ", " + transform[6] + ", " + transform[7] + ", " + transform[8] + ", " + transform[9] + ", " + transform[10] + ", " + transform[11] + "]<\/li>";
+
+        var velocity = soundDevice.listenerVelocity;
+
+        write("<ul>" + "<li>Vendor: " + soundDevice.vendor + "<\/li>" + "<li>Renderer: " + soundDevice.renderer + "<\/li>" + "<li>Version: " + soundDevice.version + "<\/li>" + "<li>Device: " + soundDevice.deviceSpecifier + "<\/li>" + "<li>Frequency: " + soundDevice.frequency + "<\/li>" + "<li>DopplerFactor: " + soundDevice.dopplerFactor + "<\/li>" + "<li>DopplerVelocity: " + soundDevice.dopplerVelocity + "<\/li>" + "<li>SpeedOfSound: " + soundDevice.speedOfSound + "<\/li>" + "<li>ListenerGain: " + soundDevice.listenerGain + "<\/li>" + transformString + "<li>ListenerVelocity: [" + velocity[0] + ", " + velocity[1] + ", " + velocity[2] + "]<\/li>" + "<li>FILEFORMAT_OGG: " + soundDevice.isSupported("FILEFORMAT_OGG") + " <\/li>" + "<li>FILEFORMAT_MP3: " + soundDevice.isSupported("FILEFORMAT_MP3") + " <\/li>" + "<li>FILEFORMAT_WAV: " + soundDevice.isSupported("FILEFORMAT_WAV") + " <\/li>" + "<li>Extensions: " + soundDevice.extensions + "<\/li>" + "<\/ul>", sdDiv);
+    } else {
+        write("<ul>" + "<li>No SoundDevice support<\/li>" + "<\/ul>", sdDiv);
+    }
+
+    var idDiv = document.getElementById("id_details");
+
+    write("<h3>Input Device Details<\/h3>", idDiv);
+    write("<ul>" + "<li>POINTER_LOCK: " + inputDevice.isSupported("POINTER_LOCK") + "<\/li>" + "<\/ul>", idDiv);
+};
+
+        // Engine startup
+        window.onload = function ()
+        {
+            var appEntry = TurbulenzEngine.onload;
+            var appShutdown = TurbulenzEngine.onunload;
+            if (!appEntry) {
+                window.alert("TurbulenzEngine.onload has not been set");
+                return;
+            }
+
+            var canvas =
+                document.getElementById('turbulenz_game_engine_canvas');
+
+            var startCanvas = function startCanvasFn()
+            {
+                if (canvas.getContext && canvasSupported)
+                {
+                    TurbulenzEngine = WebGLTurbulenzEngine.create({
+                        canvas: canvas,
+                        fillParent: true
+                    });
+
+                    if (!TurbulenzEngine) {
+                        window.alert("Failed to init TurbulenzEngine (canvas)");
+                        return;
+                    }
+
+                    TurbulenzEngine.onload = appEntry;
+                    TurbulenzEngine.onunload = appShutdown;
+                    appEntry()
+                }
+            }
+
+            var previousOnBeforeUnload = window.onbeforeunload;
+            window.onbeforeunload = function ()
+            {
+                if (TurbulenzEngine.onunload) {
+                    TurbulenzEngine.onunload.call(this);
+                }
+            };  // window.beforeunload
+
+            startCanvas();
+        };  // window.onload()
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,328 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+    <head>
+        <title>
+            Physics2D Constraints - Samples - Turbulenz Engine
+        </title>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+        <style type="text/css">
+            html, body, div, span, object, iframe, h1, h2, p, a, img, ul, li, fieldset, form, label, legend, table, thead, tbody, tfoot, tr, th, td {
+                border: 0;
+                font-size: 100%;
+                margin: 0;
+                outline: 0;
+                padding: 0;
+                vertical-align: baseline;
+            }
+        </style>
+        <!-- block tz_app_header -->
+
+        <link rel="stylesheet" type="text/css" href="css/base_template.css">
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <link rel="Stylesheet" type="text/css" href="css/jquery-ui-1.8.2.custom.css"/>
+        <script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery-ui-1.8.2.custom.min.js"></script>
+
+        <!-- end tz_app_header -->
+    </head>
+    <body style="background:#B4B4B4;font:normal normal normal 13px/1.231 Helvetica,Arial,sans-serif;text-shadow:1px 1px #F9F8F8;">
+        <div id="titlebar" style="position:fixed;height:65px;top:0;right:0;left:0;">
+            <strong style="font-size:24px;line-height:64px;margin:16px;">
+                <!-- block tz_app_title_name -->
+                Physics2D Constraints
+                <!-- end tz_app_title_name -->
+            </strong>
+            <div id="titlelogo"
+                 style="float:right;width:27px;height:27px;margin:18px 24px;">
+            </div>
+        </div>
+        <div id="sidebar"
+             style="background:#B4B4B4;position:fixed;width:303px;top:65px;left:0;">
+            <!-- block tz_app_html_controls -->
+
+            <div class="html-control control-checkbox">
+                <span class="control-title">Elastic Constraints</span>
+                <input type="checkbox" id="elasticConstraints"/>
+            </div>
+            <div class="html-control control-output-pair">Elastic Frequency:
+                <input type="text" id="frequencySliderinput" size="2" value="1" class="control-textfield">
+            </div>
+            <div class="html-control control-slider">
+                <div id="frequencySlider" class="sliderinput"></div>
+            </div>
+            <div class="html-control control-output-pair">Elastic Damping:
+                <input type="text" id="dampingSliderinput" size="2" value="0.1" class="control-textfield">
+            </div>
+            <div class="html-control control-slider">
+                <div id="dampingSlider" class="sliderinput"></div>
+            </div>
+
+            <div class="engine-control">
+                <table cellspacing="0">
+                    <tbody>
+                        <tr>
+                            <th>Key/Mouse</th><th>Physics Control</th>
+                        </tr>
+                        <tr>
+                            <td class="key">R</td>
+                            <td>Reset</td>
+                        </tr>
+                        <tr>
+                            <td class="mouse">Left click (hold)</td>
+                            <td>Manipulate body under cursor</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- end tz_app_html_controls -->
+        </div>
+        <div id="engine" style="background:#939393;position:fixed;top:65px;
+             bottom:0;right:0;left:303px;
+             border-left:1px solid #898989;">
+            <!--
+              HTML to create a plugin or canvas instance.
+              Supplied by 'tz_engine_div' variable.
+            -->
+
+            <canvas id="turbulenz_game_engine_canvas" moz-opaque="true" tabindex="1">
+                Sorry, but your browser does not support WebGL or does not have it
+                enabled.  To get a WebGL-enabled browser, please see:<br/>
+                <a href="http://www.khronos.org/webgl/wiki/Getting_a_WebGL_Implementation" target="_blank">
+                    Getting a WebGL Implementation
+                </a>
+            </canvas>
+
+            <script type="text/javascript">
+                var canvasSupported = true;
+                (function ()
+                {
+                    var contextNames = ["webgl", "experimental-webgl"];
+                    var context = null;
+                    var canvas = document.createElement('canvas');
+
+                    document.body.appendChild(canvas);
+
+                    for (var i = 0; i < contextNames.length; i += 1)
+                    {
+                        try {
+                            context = canvas.getContext(contextNames[i]);
+                        } catch (e) {
+                        }
+
+                        if (context) {
+                            break;
+                        }
+                    }
+                    if (!context)
+                    {
+                        canvasSupported = false;
+                        window.alert("Sorry, but your browser does not support WebGL or does not have it enabled.");
+                    }
+
+                    document.body.removeChild(canvas);
+                }());
+                var TurbulenzEngine = {};
+            </script>
+        </div>
+
+        <!-- begin 'tz_include_js' variable -->
+        <script type="text/javascript" src="jslib/debug.js"></script>
+        <script type="text/javascript" src="jslib/vmath.js"></script>
+        <script type="text/javascript" src="jslib/utilities.js"></script>
+        <script type="text/javascript" src="jslib/aabbtree.js"></script>
+        <script type="text/javascript" src="jslib/observer.js"></script>
+        <script type="text/javascript" src="jslib/webgl/ddsloader.js"></script>
+        <script type="text/javascript" src="jslib/webgl/graphicsdevice.js"></script>
+        <script type="text/javascript" src="jslib/webgl/inputdevice.js"></script>
+        <script type="text/javascript" src="jslib/webgl/mathdevice.js"></script>
+        <script type="text/javascript" src="jslib/webgl/networkdevice.js"></script>
+        <script type="text/javascript" src="jslib/webgl/physicsdevice.js"></script>
+        <script type="text/javascript" src="jslib/webgl/sounddevice.js"></script>
+        <script type="text/javascript" src="jslib/webgl/soundtarloader.js"></script>
+        <script type="text/javascript" src="jslib/webgl/tarloader.js"></script>
+        <script type="text/javascript" src="jslib/webgl/tgaloader.js"></script>
+        <script type="text/javascript" src="jslib/webgl/touch.js"></script>
+        <script type="text/javascript" src="jslib/webgl/touchevent.js"></script>
+        <script type="text/javascript" src="jslib/webgl/turbulenzengine.js"></script>
+        <script type="text/javascript" src="jslib/requesthandler.js"></script>
+        <script type="text/javascript" src="jslib/services/turbulenzservices.js"></script>
+        <script type="text/javascript" src="jslib/services/turbulenzbridge.js"></script>
+        <script type="text/javascript" src="jslib/services/gamesession.js"></script>
+        <script type="text/javascript" src="jslib/services/mappingtable.js"></script>
+        <script type="text/javascript" src="jslib/shadermanager.js"></script>
+        <script type="text/javascript" src="jslib/physics2ddevice.js"></script>
+        <script type="text/javascript" src="jslib/draw2d.js"></script>
+        <script type="text/javascript" src="jslib/boxtree.js"></script>
+        <script type="text/javascript" src="jslib/physics2ddebugdraw.js"></script>
+        <script type="text/javascript" src="jslib/fontmanager.js"></script>
+        <script type="text/javascript" src="scripts/htmlcontrols.js"></script>
+        <!-- end 'tz_include_js' variable -->
+
+        <script type="text/javascript">
+
+                TurbulenzEngine.onload = function onloadFn() {
+
+                    //==========================================================================
+                    // Turbulenz Initialization
+                    //==========================================================================
+                    var graphicsDevice = TurbulenzEngine.createGraphicsDevice({});
+                    var mathDevice = TurbulenzEngine.createMathDevice({});
+                    var requestHandler = RequestHandler.create({});
+
+                    var fontManager = FontManager.create(graphicsDevice, requestHandler);
+                    var shaderManager = ShaderManager.create(graphicsDevice, requestHandler);
+
+                    var font, shader, gameSession;
+                    function sessionCreated() {
+                        TurbulenzServices.createMappingTable(requestHandler, gameSession, function (mappingTable) {
+                            var urlMapping = mappingTable.urlMapping;
+                            var assetPrefix = mappingTable.assetPrefix;
+                            shaderManager.setPathRemapping(urlMapping, assetPrefix);
+                            fontManager.setPathRemapping(urlMapping, assetPrefix);
+                            fontManager.load('fonts/hero.fnt', function (fontObject) {
+                                font = fontObject;
+                            });
+                            shaderManager.load('shaders/font.cgfx', function (shaderObject) {
+                                shader = shaderObject;
+                            });
+                        });
+                    }
+                    gameSession = TurbulenzServices.createGameSession(requestHandler, sessionCreated);
+
+                    //==========================================================================
+                    // Physics2D/Draw2D (Use Draw2D to define viewport scalings)
+                    //==========================================================================
+                    var stageWidth = 40;
+                    var stageHeight = 20;
+
+                    var draw2D = Draw2D.create({
+                        graphicsDevice: graphicsDevice
+                    });
+
+                    // Configure draw2D viewport to the physics stage.
+                    // As well as the physics2D debug-draw viewport.
+                    draw2D.configure({
+                        viewportRectangle: [0, 0, stageWidth, stageHeight],
+                        scaleMode: 'scale'
+                    });
+
+                    //==========================================================================
+                    // Main loop.
+                    //==========================================================================
+                    var fontTechnique, fontTechniqueParameters;
+                    function mainLoop() {
+                        if (!graphicsDevice.beginFrame()) {
+                            return;
+                        }
+
+                        graphicsDevice.clear([0.3, 0.3, 0.3, 1.0]);
+
+                        // Draw fonts.
+                        graphicsDevice.setTechnique(fontTechnique);
+                        fontTechniqueParameters.clipSpace = mathDevice.v4Build(2 / graphicsDevice.width, -2 / graphicsDevice.height, -1, 1, fontTechniqueParameters.clipSpace);
+                        graphicsDevice.setTechniqueParameters(fontTechniqueParameters);
+
+                        function segmentFont(x, y, text, height) {
+                            var topLeft = draw2D.viewportUnmap(x, y);
+                            var bottomRight = draw2D.viewportUnmap(x + 10, y + height);
+                            font.drawTextRect(text, {
+                                rect: [topLeft[0], topLeft[1], bottomRight[0] - topLeft[0], bottomRight[1] - topLeft[1]],
+                                scale: 1.0,
+                                spacing: 0,
+                                alignment: 1
+                            });
+                        }
+
+                        var titleHeight = 0.75;
+                        segmentFont(0, 0, "Point", titleHeight);
+                        segmentFont(10, 0, "Weld", titleHeight);
+                        segmentFont(20, 0, "Distance", titleHeight);
+                        segmentFont(30, 0, "Line", titleHeight);
+                        segmentFont(0, 10, "Angle", titleHeight);
+                        segmentFont(10, 10, "Motor", titleHeight);
+                        segmentFont(20, 10, "Pulley", titleHeight);
+                        segmentFont(30, 10, "Custom", titleHeight);
+
+                        graphicsDevice.endFrame();
+                    }
+
+                    var intervalID = 0;
+                    function loadingLoop() {
+                        if (font && shader) {
+                            fontTechnique = shader.getTechnique('font');
+                            fontTechniqueParameters = graphicsDevice.createTechniqueParameters({
+                                clipSpace: mathDevice.v4BuildZero(),
+                                alphaRef: 0.01,
+                                color: mathDevice.v4BuildOne()
+                            });
+
+                            TurbulenzEngine.clearInterval(intervalID);
+                            intervalID = TurbulenzEngine.setInterval(mainLoop, 1000 / 60);
+                        }
+                    }
+                    intervalID = TurbulenzEngine.setInterval(loadingLoop, 100);
+
+
+                    // Create a scene destroy callback to run when the window is closed
+                    TurbulenzEngine.onunload = function destroyScene() {
+                        if (intervalID) {
+                            TurbulenzEngine.clearInterval(intervalID);
+                        }
+
+                        if (gameSession) {
+                            gameSession.destroy();
+                            gameSession = null;
+                        }
+                    };
+                };
+
+                // Engine startup
+                window.onload = function ()
+                {
+                    var appEntry = TurbulenzEngine.onload;
+                    var appShutdown = TurbulenzEngine.onunload;
+                    if (!appEntry) {
+                        window.alert("TurbulenzEngine.onload has not been set");
+                        return;
+                    }
+
+                    var canvas =
+                            document.getElementById('turbulenz_game_engine_canvas');
+
+                    var startCanvas = function startCanvasFn()
+                    {
+                        if (canvas.getContext && canvasSupported)
+                        {
+                            TurbulenzEngine = WebGLTurbulenzEngine.create({
+                                canvas: canvas,
+                                fillParent: true
+                            });
+
+                            if (!TurbulenzEngine) {
+                                window.alert("Failed to init TurbulenzEngine (canvas)");
+                                return;
+                            }
+
+                            TurbulenzEngine.onload = appEntry;
+                            TurbulenzEngine.onunload = appShutdown;
+                            appEntry()
+                        }
+                    }
+
+                    var previousOnBeforeUnload = window.onbeforeunload;
+                    window.onbeforeunload = function ()
+                    {
+                        if (TurbulenzEngine.onunload) {
+                            TurbulenzEngine.onunload.call(this);
+                        }
+                    };  // window.beforeunload
+
+                    startCanvas();
+                };  // window.onload()
+
+        </script>
+
+    </body>
+</html>
